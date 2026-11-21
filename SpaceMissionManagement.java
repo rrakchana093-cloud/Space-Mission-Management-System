@@ -29,7 +29,13 @@ public class SpaceMissionManagement {
             System.out.println("Required fuel: "
                     + mission.calculateFuelRequired());
             // Runtime polymorphism: Calls the launch method of the actual object.
-            mission.launch();
+            // Threading: Creates a separate thread for mission execution.
+            MissionLaunchTask task = new MissionLaunchTask(mission);
+            Thread launchThread = new Thread(task);
+            // Starts the mission launch thread.
+            launchThread.start();
+            // Main thread waits until the launch thread completes.
+            launchThread.join();mission.launch();
         // Exception handling: Catches insufficient fuel errors.
         } catch (InsufficientFuelException e) {
             System.out.println("Launch Error: " + e.getMessage());
@@ -40,7 +46,10 @@ public class SpaceMissionManagement {
         } catch (java.util.InputMismatchException e) {
             System.out.println("Please enter valid numeric input.");
         // Finally block: Executes cleanup and displays the mission count.
-        } finally {
+        } catch (InterruptedException e) {
+            System.out.println("Main thread interrupted!");
+            Thread.currentThread().interrupt();
+        }finally {
             System.out.println("Total missions created: "
                     + SpaceMission.missionCount);
             System.out.println("Mission system closed.");
