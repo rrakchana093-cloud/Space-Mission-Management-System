@@ -1,3 +1,4 @@
+import java.io.IOException;
 import java.util.Scanner;
 // Main class: Accepts user input and manages space mission execution.
 public class SpaceMissionManagement {
@@ -36,7 +37,13 @@ public class SpaceMissionManagement {
             launchThread.start();
             // Main thread waits until the launch thread completes.
             launchThread.join();mission.launch();
-        // Exception handling: Catches insufficient fuel errors.
+            // Exception handling: Catches insufficient fuel errors.
+            // File Handling: Saves the completed mission details into a file.
+            MissionFileManager.saveMissionReport(mission);
+            // File Handling: Reads and searches the saved mission report.
+            System.out.print("Enter Mission ID to search: ");
+            String searchId = sc.next();
+            MissionFileManager.readMissionReports(searchId);
         } catch (InsufficientFuelException e) {
             System.out.println("Launch Error: " + e.getMessage());
         // Exception handling: Catches invalid fuel values.
@@ -49,6 +56,8 @@ public class SpaceMissionManagement {
         } catch (InterruptedException e) {
             System.out.println("Main thread interrupted!");
             Thread.currentThread().interrupt();
+        }catch (IOException e) {
+            System.out.println("File Error: " + e.getMessage());
         }finally {
             System.out.println("Total missions created: "
                     + SpaceMission.missionCount);
